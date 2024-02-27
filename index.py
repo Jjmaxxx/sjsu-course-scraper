@@ -18,15 +18,15 @@ def parseBody(body):
     # name = body.pop(0)
     deparment, course, name = body.pop(0).strip().split(" ",2)
     name = name.split("- ", 1)[1]   
-    units = body.pop(0)
-    description = next((text for text in body if not text.startswith("Prerequisite(s)") and not text.startswith("Grading: ")), None)
+    units = next((text for text in body if text.endswith("unit(s)")), None)
+    description = next((text for text in body if not text.startswith("Prerequisite(s)") and not text.startswith("Grading: ") and not text.endswith("unit(s)")), None)
     prereqs = next((text for text in body if text.startswith("Prerequisite(s)") or text.startswith("Pre/Corequisite(s)")), None)
     crosslist = next((text for text in body if text.startswith("Cross-listed ")), None)
     grading = next((text for text in body if text.startswith("Grading: ")), None)
     satisfies = next((text for text in body if text.startswith("Satisfies ")), None)
     repeatable = next((text for text in body if text.startswith("Course may be repeated for credit for up to ")), None)
     sustainability = next((text for text in body if text.startswith("Sustainability")), None)
-    notes = next((text for text in body if "Note(s):" in text), None)
+    notes = next((text for text in body if text.startswith("Note(s):")), None)
     
     return [deparment, course, name,units,description,prereqs,satisfies,grading,repeatable,crosslist,sustainability,notes]
 
@@ -89,6 +89,7 @@ def save_to_csv(filename, data):
             writer.writerow(["Department","Course","Name","Units","Description","Prereqs","Satisfies","Grading","Repeatable","Crosslist","Sustainability","Notes"])
         writer.writerows(data)
 
+prefix = ["CHE"]
 courses,departments = scrape_courses(prefix)
 save_to_csv('courses.csv',courses)
 save_to_csv('departments.csv',departments)
